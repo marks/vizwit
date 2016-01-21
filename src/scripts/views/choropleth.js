@@ -125,7 +125,17 @@ module.exports = Card.extend({
 			'Total: ' + layer.feature.properties.value.toLocaleString()
     if (layer.feature.properties.filteredValue !== undefined) {
       popupContent += '<br>Filtered Amount: ' + layer.feature.properties.filteredValue.toLocaleString()
+      // Try to add percentage to filtered value
+      try {
+        var percentOfTotal = (parseFloat(layer.feature.properties.filteredValue) / parseFloat(layer.feature.properties.value) * 100).toFixed(2)
+        if (percentOfTotal !== 'NaN') { // NaN becomes "NaN" when converted to Fixed
+          popupContent += ' (' + percentOfTotal + '%)'
+        }
+      } catch (err) {
+        console.log(err)
+      }
     }
+
     popupContent += '</div>'
 
     this.popup.setLatLng(e.latlng)
