@@ -31,9 +31,18 @@ module.exports = BaseChart.extend({
         lineColor: '#97bbcd',
         dateFormat: 'MMM YYYY',
         balloonFunction: function (item, graph) {
-          return '<b>' + AmCharts.formatDate(item.category, graph.dateFormat) + '</b><br>' +
-						'Total: ' + (+item.dataContext.value).toLocaleString() + '<br>' +
-						'Filtered Amount: ' + (+item.dataContext.filteredValue).toLocaleString()
+          var baloonHtml = '<b>' + AmCharts.formatDate(item.category, graph.dateFormat) +
+            '</b><br>Total: ' + (+item.dataContext.value).toLocaleString() +
+            '<br>Filtered Amount: ' + (+item.dataContext.filteredValue).toLocaleString()
+          try{
+            var percentOfTotal = (parseFloat(item.dataContext.filteredValue)/parseFloat(item.dataContext.value)*100).toFixed(2)
+            if(percentOfTotal != "NaN"){ // NaN becomes "NaN" when converted to Fixed
+              baloonHtml += ' (' + percentOfTotal + '%)'  
+            }
+          } catch(err){
+            console.log(err)
+          }
+          return baloonHtml
         }
       }
     ],
