@@ -1,4 +1,5 @@
 var _ = require('underscore')
+var $ = require('jquery')
 var Card = require('./card')
 var LoaderOn = require('../util/loader').on
 var LoaderOff = require('../util/loader').off
@@ -26,23 +27,27 @@ var addDescriptionToTitle = function (column) {
   return column
 }
 
-var rowDetails = function(rowData, columns) {
-  /* create columnLookup so we get column names and tooltips */ 
+var rowDetails = function (rowData, columns) {
+  // create columnLookup so we get column names and tooltips
   var columnLookup = {}
-  _.each(columns, function(column){
-    if(column.data != null) // skip the first column where the [+] icon goes
+  _.each(columns, function (column) {
+    if (column.data != null) {
       columnLookup[column.data] = column.title || column.data
+    }
   })
+
   var s = '<div class="table-responsive"><table class="table row-detail">'
   s += '<thead><tr><th style="width: 15%">Attribute</th><th>Value</th></tr></thead>'
   s += '<tbody>'
-  _.each(columnLookup, function(title,key){
-    s += '<tr><td>'+title+'</td><td>'
-    if(!_.isUndefined(rowData[key])){
+
+  _.each(columnLookup, function (title, key) {
+    s += '<tr><td>' + title + '</td><td>'
+    if (!_.isUndefined(rowData[key])) {
       s += rowData[key]
     }
-    s += '</td></tr>'  
+    s += '</td></tr>'
   })
+
   s += '</tbody></table></div>'
   return s
 }
@@ -77,15 +82,14 @@ module.exports = Card.extend({
 
         columns = columns.map(addDescriptionToTitle)
 
-        if(this.config.rowDetails){
+        if (this.config.rowDetails) {
           // Add row detail control column
           columns.unshift({
-            "class": "row-detail-control fa fa-plus-square-o",
-            "orderable": false,
-            "data": null,
-            "defaultContent": ""
+            class: 'row-detail-control fa fa-plus-square-o',
+            orderable: false,
+            data: null,
+            defaultContent: ''
           })
-
         }
 
         // Initialize the table
@@ -98,27 +102,26 @@ module.exports = Card.extend({
           ajax: _.bind(this.dataTablesAjax, this)
         })
 
-        /* store this.table as table, which is used in the following callback */
-        if(this.config.rowDetails){
+        if (this.config.rowDetails) {
+          // store this.table as table, which is used in the following callback
           var table = this.table
-          /* listen for row detail icon click and act apropriately*/
-          container.on( 'click', 'tr td.row-detail-control', function () {
-              var clicked = jQuery(this)
-              var tr = clicked.closest('tr');
-              var row = table.row( tr );
-              if ( row.child.isShown() ) {
-                  clicked.removeClass("fa-minus-square-o")
-                  clicked.addClass("fa-plus-square-o")
-                  tr.removeClass( 'details' );
-                  row.child.hide();
-              }
-              else {
-                  clicked.addClass("fa-minus-square-o")
-                  clicked.removeClass("fa-plus-square-o")
-                  tr.addClass( 'details' );
-                  row.child( rowDetails(row.data(), columns) ).show();
-              }
-          } );
+          // listen for row detail icon click and act apropriately
+          container.on('click', 'tr td.row-detail-control', function () {
+            var clicked = $(this)
+            var tr = clicked.closest('tr')
+            var row = table.row(tr)
+            if (row.child.isShown()) {
+              clicked.removeClass('fa-minus-square-o')
+              clicked.addClass('fa-plus-square-o')
+              tr.removeClass('details')
+              row.child.hide()
+            } else {
+              clicked.addClass('fa-minus-square-o')
+              clicked.removeClass('fa-plus-square-o')
+              tr.addClass('details')
+              row.child(rowDetails(row.data(), columns)).show()
+            }
+          })
         }
 
         this.activateTooltips(container)
