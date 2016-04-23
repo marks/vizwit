@@ -29,7 +29,6 @@ module.exports = Backbone.View.extend({
       'click .remove-filter': 'onClickRemoveFilter',
       'click .embed-link': 'onClickEmbedLink',
       'click .export-link-jpg': 'onClickExportLinkJPG',
-      'click .expand-card': 'onClickExpandLink'
     }, this.events || {})
     this.delegateEvents()
 
@@ -114,41 +113,6 @@ module.exports = Backbone.View.extend({
           this.download( data, "image/jpg", "chart.jpg" );
         } );
       } );
-    e.preventDefault()
-  },
-  onClickExpandLink: function (e) {
-    var card_el = this.$el
-    if (card_el.attr("data-expanded") == "true") {
-      // Contract card height
-      card_el.attr("style",card_el.attr("data-original-styles"))
-      card_el.css("min-height",card_el.attr("data-original-min-height"))
-      card_el.height(card_el.attr("data-original-height")-15) // not sure why I need to make this smaller than it was
-      // Contract card width
-      var originalClasses = card_el.attr("data-original-classes")
-      card_el.addClass("col-sm-12")
-      card_el.attr("data-original-classes","")
-      card_el.attr("class",originalClasses)
-      // Set state as not expanded
-      card_el.attr("data-expanded","false")
-    } else { 
-      // Expand width
-      var originalClasses = card_el.attr("class")
-      card_el.attr("data-original-classes",originalClasses)
-      card_el.removeClass(originalClasses)
-      card_el.addClass("col-sm-12")
-      // Expand height
-      card_el.attr("data-original-styles",card_el.attr("style"))
-      card_el.attr("data-original-height",card_el.height())
-      card_el.attr("data-original-min-height",card_el.css("min-height"))
-      card_el.css("min-height",parseInt(card_el.css("min-height")*1.5)+"px")
-      // Set state as expanded
-      card_el.attr("data-expanded","true")
-    }
-    this.setHeight()
-    if (this.config.chartType == "choropleth") {
-      // Leaflet maps need to be refreshed upon container size change
-      this.map.invalidateSize()
-    }
     e.preventDefault()
   }
 })
