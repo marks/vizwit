@@ -28,7 +28,7 @@ module.exports = Backbone.View.extend({
     this.events = _.extend({
       'click .remove-filter': 'onClickRemoveFilter',
       'click .embed-link': 'onClickEmbedLink',
-      'click .export-link-jpg': 'onClickExportLinkJPG',
+      'click .export-link-jpg': 'onClickExportLinkJPG'
     }, this.events || {})
     this.delegateEvents()
 
@@ -108,11 +108,11 @@ module.exports = Backbone.View.extend({
     e.preventDefault()
   },
   onClickExportLinkJPG: function (e) {
-    this.chart["export"].capture( {}, function() {
-        this.toJPG( {}, function( data ) {
-          this.download( data, "image/jpg", "chart.jpg" );
-        } );
-      } );
+    this.chart['export'].capture({}, function () {
+      this.toJPG({}, function (data) {
+        this.download(data, 'image/jpg', 'chart.jpg')
+      })
+    })
     e.preventDefault()
   }
 })
