@@ -27,7 +27,8 @@ module.exports = Backbone.View.extend({
     // Delegate event here so as not to have it overriden by child classes' events properties
     this.events = _.extend({
       'click .remove-filter': 'onClickRemoveFilter',
-      'click .embed-link': 'onClickEmbedLink'
+      'click .embed-link': 'onClickEmbedLink',
+      'click .export-link-jpg': 'onClickExportLinkJPG',
     }, this.events || {})
     this.delegateEvents()
 
@@ -99,11 +100,19 @@ module.exports = Backbone.View.extend({
   },
   updateExportLink: function (collection) {
     collection = collection || this.collection
-    this.$('.export-link').attr('href', collection.exportUrl())
+    this.$('.export-link-csv').attr('href', collection.exportUrl())
   },
   onClickEmbedLink: function (e) {
     var exportView = new EmbedHelperView({model: new Backbone.Model(this.config)})
     this.$el.after(exportView.render().el)
+    e.preventDefault()
+  },
+  onClickExportLinkJPG: function (e) {
+    this.chart["export"].capture( {}, function() {
+        this.toJPG( {}, function( data ) {
+          this.download( data, "image/jpg", "chart.jpg" );
+        } );
+      } );
     e.preventDefault()
   }
 })

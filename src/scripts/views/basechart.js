@@ -7,6 +7,8 @@ var LoaderOff = require('../util/loader').off
 ;require('amcharts3/amcharts/serial')
 ;require('amcharts3/amcharts/themes/light')
 ;require('amcharts3/amcharts/plugins/responsive/responsive')
+;require('amcharts3/amcharts/plugins/export/export')
+
 var AmCharts = window.AmCharts
 AmCharts.path = './'
 
@@ -56,6 +58,13 @@ module.exports = Card.extend({
     }
 
     this.updateGuide(config)
+
+    config.export = {
+      enabled: true,
+      menu: [],
+      libs: {path: '//cdn.amcharts.com/lib/3/plugins/export/libs/'}
+    }
+    this.$('.export-link-jpg').show()
 
     // Initialize the chart
     this.chart = AmCharts.makeChart(null, config)
