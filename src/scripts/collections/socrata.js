@@ -10,7 +10,27 @@ var MAX_ROWS_TO_EXPORT = 100000000 // Export up to 100M records (a null or empty
 module.exports = BaseProvider.extend({
   initialize: function (models, options) {
     BaseProvider.prototype.initialize.apply(this, arguments)
-    this.consumer = new soda.Consumer(this.config.domain)
+
+    sodaOpts = {}
+
+    // if a sodaProxy is passed, send cross domain cookies as told by https://cdnjs.com/libraries/backbone.js/tutorials/cross-domain-sessions
+    if(this.config.sodaProxy){      
+      var that = this
+      $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
+        options.xhrFields = {
+          withCredentials: true
+        };
+        // If we have a csrf token send it through with the next request
+        if(typeof that.get('_csrf') !== 'undefined') {
+          jqXHR.setRequestHeader('X-CSRF-Token', that.get('_csrf'));
+        }
+      });
+      sodaOpts['sodaProxy'] = this.config.sodaProxy
+    }
+
+    this.consumer = new soda.Consumer(this.config.domain,sodaOpts)
+
+
   },
   fieldsCollection: SocrataFields,
   url: function () {
