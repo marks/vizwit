@@ -33,7 +33,7 @@
     "leaflet-choropleth": "^1.0.3",
     "moment": "^2.10.6",
     "numbro": "^1.3.3",
-    "soda-js": "socrata/soda-js",
+    "soda-js": "marks/soda-js#support-proxies",
     "spin.js": "^2.3.2",
     "split.js": "^1.0.6",
     "underscore": "^1.8.3"

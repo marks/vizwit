@@ -10,7 +10,25 @@ var MAX_ROWS_TO_EXPORT = 100000000 // Export up to 100M records (a null or empty
 module.exports = BaseProvider.extend({
   initialize: function (models, options) {
     BaseProvider.prototype.initialize.apply(this, arguments)
-    this.consumer = new soda.Consumer(this.config.domain)
+    this.bind("error", this.errorHandler);
+
+    sodaOpts = {}
+    // if a sodaProxy is passed, send cross domain cookies as told by https://cdnjs.com/libraries/backbone.js/tutorials/cross-domain-sessions
+    if(this.config.sodaProxy){      
+      var that = this
+      $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
+        options.xhrFields = {
+          withCredentials: true
+        };
+        // If we have a csrf token send it through with the next request
+        if(typeof that.get('_csrf') !== 'undefined') {
+          jqXHR.setRequestHeader('X-CSRF-Token', that.get('_csrf'));
+        }
+      });
+      sodaOpts['sodaProxy'] = this.config.sodaProxy
+    }
+    this.consumer = new soda.Consumer(this.config.domain,sodaOpts)
+
   },
   fieldsCollection: SocrataFields,
   url: function () {
@@ -114,6 +132,13 @@ module.exports = BaseProvider.extend({
           error: reject
         })
       })
+    }
+  },
+  errorHandler: function(coll,xhrReq,error) {
+    if(xhrReq.status == 403 && coll.config.sodaProxy){
+      var proxyDomain = coll.config.sodaProxy.split("/")[0]
+      var proxyAuthUrl = "https://"+proxyDomain+"/login/"+coll.config.domain+"?return="+location.href
+      $("#page-content").prepend("<div class='alert alert-danger'>Uh oh. A <strong>403: Forbidden</strong> header was sent by one of the datasets you are trying to access. You probably just forgot to authenticate with the secure proxy. <a href='"+proxyAuthUrl+"'>Click here to do that now. You will be brought back to this page.</a></div>")
     }
   }
 })

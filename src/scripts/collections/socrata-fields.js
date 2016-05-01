@@ -18,9 +18,13 @@ module.exports = BaseFields.extend({
     this.config = options || {}
   },
   url: function () {
+    var domainSegment = this.config.domain
+    if(this.config.sodaProxy){
+      domainSegment = this.config.sodaProxy + "/" + domainSegment
+    }
     return [
       'https://',
-      this.config.domain,
+      domainSegment,
       '/api',
       '/views',
       '/' + this.config.dataset,
